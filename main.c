@@ -7,13 +7,12 @@ int highlight = 1;
 int choice = 0;
 int c;
 char *menu_items[] = {
-        "  Adauga un event",
-        "  Sterge un event",
-        "  Vizualizarea evenimentelor",
-        "  Cauta o intalnire",
-        "  Iesi"
+        "  Add an event",
+        "  Delete an event",
+        "  View your calendar",
+        "  Search by date",
+        "  Exit"
     };
-
 
 int menu_size = sizeof(menu_items) / sizeof(menu_items[0]);
 typedef struct {
@@ -51,8 +50,8 @@ int is_valid_date(char *date) {
 void main_menu(int hi){
         clear();
         char *datetime = get_current_datetime();
-        printw("============Meniul Principal============\n");
-        printw("== Utilizati sagetile pentru navigare ==\n");
+        printw("============ Main menu ============\n");
+        printw("=== Use the arrows to navigate ====\n");
         printw("========================================\n");
         printw("============%s============\n",datetime);
         printw("========================================\n\n");
@@ -108,27 +107,27 @@ void add_meeting(){
     meeting m;
     attron(COLOR_PAIR(1));
     mvprintw(1,15,"================================================\n");
-    mvprintw(2,15,"========== Introdu data evenimentului ==========\n");
-    mvprintw(3,15,"====== Formatul trebuie sa fie YYYY-MM-DD ======\n");
+    mvprintw(2,15,"============= Enter the event date =============\n");
+    mvprintw(3,15,"====== The format should be : YYYY-MM-DD =======\n");
     mvprintw(4,15,">>> ");
     getstr(m.date);
     if (!is_valid_date(m.date)) {
-        mvprintw(5,15,"Data introdusa nu imi place\n");
+        mvprintw(5,15,"I don't like the entered date\n");
         getch();
         return;
     }
     attroff(COLOR_PAIR(1));
     attron(COLOR_PAIR(2));
-    mvprintw(6,15,"========== Introdu ora evenimentului ===========\n");
+    mvprintw(6,15,"========== Enter the event hour ===========\n");
     mvprintw(7,15,">>> ");
     getstr(m.hour);
     attroff(COLOR_PAIR(2));
     attron(COLOR_PAIR(3));
-    mvprintw(8,15,"======== Introdu denumirea evenimentului =======\n");
+    mvprintw(8,15,"========== Enter the event name =========\n");
     mvprintw(9,15,">>> ");
     getstr(m.name);
     attroff(COLOR_PAIR(3));
-    mvprintw(10,15,"========== Introdu locul evenimentului =========\n");
+    mvprintw(10,15,"========== Enter the place of the event=========\n");
     mvprintw(11,15,">>> ");
     getstr(m.place);
 
@@ -145,7 +144,7 @@ void add_meeting(){
     // Close the file
     fclose(fp);
 
-   mvprintw(11,15," Apasa Backspace pentru a reveni la Meniul Principal");
+   mvprintw(11,15," Press Backspace to go to main menu ");
    int c = getch();
    if(c == KEY_BACKSPACE)
        choose();
@@ -159,7 +158,7 @@ void delete_meeting(){
     char name[80];
     int found = 0;
     mvprintw(1,15,"================================================\n");
-    mvprintw(2,15,"============== Vizualizarea evenimentelor ======\n");
+    mvprintw(2,15,"============== Your Events ======\n");
 
     // Open the text file in read mode
     FILE *fp = fopen("events.txt", "r");
@@ -172,13 +171,13 @@ void delete_meeting(){
     int line = 4;
     meeting m;
     while (fscanf(fp, "%s %s %s %s\n", m.date, m.hour, m.name, m.place) == 4) {
-        mvprintw(line++, 15, "Data: %s Ora: %s Numele: %s Locul: %s\n", m.date, m.hour, m.name, m.place);
+        mvprintw(line++, 15, "Date: %s Hour: %s Name: %s Place: %s\n", m.date, m.hour, m.name, m.place);
     }
 
    // Close the file
    fclose(fp);
-    mvprintw(line + 1,15,"============== Ce vrei sa stergi? ==============\n");
-    mvprintw(line + 2,15,"Scrie numele evenimentului sau apasa ~ pentru a iesi\n");
+    mvprintw(line + 1,15,"============== What do you want to delete? ==============\n");
+    mvprintw(line + 2,15,"Write the event name or press ~ to exit \n");
    while (!found) {
 
        mvprintw(line + 3,15,">>>");
@@ -208,7 +207,7 @@ void delete_meeting(){
        fclose(fp);
 
        if (!found) {
-           mvprintw(line + 7,15,"Numele evenimentului nu a fost gasit. Incearca din nou.\n");
+           mvprintw(line + 7,15,"The entered name wasn't found, please retry.\n");
            line++;
        }
    }
@@ -245,8 +244,8 @@ void delete_meeting(){
    // Delete the original text file and rename the temporary file
    remove("events.txt");
    rename("tmp.txt", "events.txt");
-    mvprintw(line+6,15," Evenimentul '%s' a fost sters",name);
-   mvprintw(line + 7 ,15," Apasa Backspace pentru a reveni la Meniul Principal");
+    mvprintw(line+6,15," Event '%s' was deleted",name);
+   mvprintw(line + 7 ,15,"  Press Backspace to go to main menu ");
    int c = getch();
    if(c == KEY_BACKSPACE)
        choose();
@@ -260,7 +259,7 @@ void view(){
     echo();
     char str[80];
     mvprintw(1,15,"================================================\n");
-    mvprintw(2,15,"============== Vizualizarea evenimentelor ======\n");
+    mvprintw(2,15,"============== Your events ======\n");
 
     // Open the text file in read mode
     FILE *fp = fopen("events.txt", "r");
@@ -273,7 +272,7 @@ void view(){
     int line = 4;
     meeting m;
     while (fscanf(fp, "%s %s %s %s\n", m.date, m.hour, m.name, m.place) == 4) {
-        mvprintw(line++, 15, "Data: %s Ora: %s Denumirea: %s Locul: %s\n", m.date, m.hour, m.name, m.place);
+        mvprintw(line++, 15, "Date: %s Hour: %s Name: %s Place: %s\n", m.date, m.hour, m.name, m.place);
     }
 
    // Close the file
@@ -285,7 +284,7 @@ void view(){
        break;
    }
 
-   mvprintw(line + 2, 15," Apasa Backspace pentru a reveni la Meniul Principal");
+   mvprintw(line + 2, 15," Press Backspace to go to main menu ");
    int c = getch();
    if(c == KEY_BACKSPACE)
        choose();
@@ -297,8 +296,8 @@ void search_meetings(){
     echo();
     char date[80];
     mvprintw(1,15,"================================================\n");
-    mvprintw(2,15,"============== Cauta evenimente ================\n");
-    mvprintw(3,15,"Introdu data evenimentelor pe care vrei sa le cauti (YYYY-MM-DD):\n");
+    mvprintw(2,15,"================ Search events =================\n");
+    mvprintw(3,15,"Enter the date of the searched event (YYYY-MM-DD):\n");
     mvprintw(4,15,">>>");
     getstr(date);
 
@@ -315,18 +314,18 @@ void search_meetings(){
     int flag = 0;
     while (fscanf(fp, "%s %s %s %s\n", m.date, m.hour, m.name, m.place) == 4) {
         if (strcmp(m.date, date) == 0) {
-            mvprintw(line++, 15, "Data: %s Ora: %s Denumirea: %s Locul: %s\n", m.date, m.hour, m.name, m.place);
+            mvprintw(line++, 15, "Date: %s Hour: %s Name: %s Place: %s\n", m.date, m.hour, m.name, m.place);
             flag = 1;
         }
 
     }
     if(flag == 0){
-    mvprintw(line,15," Nu am gasit nici un element la aceasta data :(((((((");
+    mvprintw(line,15,"We didn't find any events at this date :(((");
     }
 
    // Close the file
    fclose(fp);
-   mvprintw(line + 1, 15," Apasa Backspace pentru a reveni la Meniul Principal");
+   mvprintw(line + 1, 15," Press Backspace to go to main menu ");
    int c = getch();
    if(c == KEY_BACKSPACE)
        choose();
